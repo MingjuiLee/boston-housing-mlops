@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boston-housing-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: boston-housing
+  template:
+    metadata:
+      labels:
+        app: boston-housing
+    spec:
+      containers:
+        - name: boston-housing
+          image: raylee1208/boston-housing-api:latest
+          imagePullPolicy: IfNotPresent # ✅ 若本地已有映像，不再重拉
+          ports:
+            - containerPort: 5000
