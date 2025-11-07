@@ -1,38 +1,32 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import pandas as pd
-from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
-from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
 
-# === 模型訓練階段 ===
+# 載入模型
 url = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
 df = pd.read_csv(url)
-
 X = df.drop('medv', axis=1)
 y = df['medv']
-
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-
-model = LinearRegression()
-model.fit(X_scaled, y)
+scaler = StandardScaler().fit(X)
+model = LinearRegression().fit(scaler.transform(X), y)
 
 
 @app.route('/')
 def home():
-    return "🏠 Boston Housing Price API is running!"
+    return render_template('index.html')
 
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.get_json()
-    df_input = pd.DataFrame([data])
-    df_scaled = scaler.transform(df_input)
-    prediction = model.predict(df_scaled)[0]
-    return jsonify({'predicted_price': round(prediction, 2)})
+    data = [float(x) for x in request.form.values()]
+    features = pd.DataFrame([data], columns=X.columns)
+    features_scaled = scaler.transform(features)
+    prediction = model.predict(features_scaled)[0]
+    return render_template('index.html', prediction_text=f'預測房價: {prediction:.2f} 千美元')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

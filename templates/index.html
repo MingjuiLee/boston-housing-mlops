@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Boston Housing Price Predictor</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 40px;
+            background: #f8f9fa;
+        }
+
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 60%;
+        }
+
+        input {
+            padding: 6px;
+        }
+
+        button {
+            grid-column: span 2;
+            padding: 10px;
+            background: steelblue;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>🏠 Boston Housing Price Prediction</h2>
+    <form action="/predict" method="post">
+        {% for col in ['crim','zn','indus','chas','nox','rm','age','dis','rad','tax','ptratio','b','lstat'] %}
+        <label>{{ col }}:</label>
+        <input type="number" name="{{ col }}" step="any" required>
+        {% endfor %}
+        <button type="submit">預測房價</button>
+    </form>
+    {% if prediction_text %}
+    <h3>{{ prediction_text }}</h3>
+    {% endif %}
+</body>
+
+</html>
